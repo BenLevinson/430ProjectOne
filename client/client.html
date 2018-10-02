@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Scrapbook API</title>
+  <link rel="stylesheet" type="text/css" href="/style.css">
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
+  <script type="text/babel">
+    
+    let currNum = 0;
+
+    const parseJSON = (xhr, right, initialGet, newImage) => {
+        const jsonParser = JSON.parse(xhr.response);  
+        const altTitle = `${jsonParser.message}`;
+        if(!initialGet) {
+            if(jsonParser.message) {
+                if(!right.querySelector('#h1')) {
+                    const h1 = document.createElement('h1');
+                    h1.setAttribute('id', 'h1');
+                    h1.style.color = 'black';
+                    h1.style.zIndex = '1';
+                    h1.style.position = 'absolute';
+                    h1.style.top = 100 + 'px';
+                    h1.style.left = 1210 + 'px';
+                    h1.style.textAlign = 'center';
+                    h1.textContent = `${jsonParser.message}`;
+                    altTitle 
+                    right.appendChild(h1);
+                } else {
+                    right.querySelector('#h1').innerHTML = `${jsonParser.message}`;
+                }
+            }
+        }
+        if(jsonParser.url) {
+            if(!initialGet)
+                right.querySelector('#newImg').src = `${jsonParser.url}`;
+            
+            if(newImage) {
+                document.querySelector('#standardPhoto' + currNum).src = `${jsonParser.url}`;
+                document.querySelector('#standardPhoto' + currNum).alt = altTitle;
+            } else if(initialGet) {
+                for(let i = 1; i < 10; i++) {
+                    document.querySelector('#standardPhoto' + i).src = `${jsonParser.url[i-1]}`;
+                    document.querySelector('#standardPhoto' + i).alt = altTitle;
+                    console.dir("url: " + `${jsonParser.url}`);
+                }                
+            }
+           
+        }
+    };
+
+    const handleResponse = (xhr, parseResponse, initialGet) => {
+      const right = document.querySelector('#right');
+      let newImage = false;
+      switch(xhr.status) {
+        case 200:
+          if(!initialGet && parseResponse) {
+              if(!right.querySelector('#newImg')) {
+                const newImg = document.createElement('img');
+                newImg.setAttribute('id', 'newImg');
+                right.appendChild(newImg);
+                console.log("Success");
+              }
+          } else if(!initialGet && !parseResponse) {
+              console.log("Head data test successful");
+          }
+          break;
+        case 201: 
+          if(!right.querySelector('#newImg')) {
+            const newImg = document.createElement('img');
+            newImg.setAttribute('id', 'newImg');
+            right.appendChild(newImg);
+          }
+          newImage = true;
+          console.log("Created");
+          break;
+        case 204:
+          newImage = true;
+          console.log("Updated");
+          return;
+        case 400:
+          console.log("Bad Request");
+          break;
+        case 404:
+          console.log("Not Found");
+          break;
+        default: 
+          console.log("Error code not implemented by client.");
+          break;
+      }
+      if(parseResponse)
+        parseJSON(xhr, right, initialGet, newImage);
+     
+    };
+
+    const sendAjax = (e, photo, initialGet, method) => {
+        const picTitle = photo.querySelector('#titleField');
+        const picUpload = photo.querySelector('#picField');
+        const picNum = photo.querySelector('#picNumField');
+        if(method === 'GET' || method === 'HEAD') {
+            const photoName = photo.getAttribute('action');
+            const xhr = new XMLHttpRequest();
+            if(method === 'GET')
+                xhr.open('GET', photoName);
+            else
+                xhr.open('HEAD', photoName);
+            xhr.setRequestHeader ('Accept', 'application/json');
+            if(initialGet) {
+                xhr.onload = () => handleResponse(xhr, true, true);
+            } else if(!initialGet && method === 'GET') {
+                xhr.onload = () => handleResponse(xhr, true, false);
+            } else if(!initialGet && method === 'HEAD') {
+                xhr.onload = () => handleResponse(xhr, false, false);
+            }
+            xhr.send();
+        } else if(method === 'POST') {
+            const formAction = photo.getAttribute('action');
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', formAction);
+            xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+            xhr.setRequestHeader ('Accept', 'application/json');
+            xhr.onload = () => handleResponse(xhr, true, initialGet);
+            const formData = `title=${picTitle.value}&photo=${picUpload.value}&picNum=${picNum.value}`;
+            currNum = picNum.value;
+            xhr.send(formData);
+        }
+        
+        e.preventDefault();
+        return false;
+    };
+
+    const init = () => {
+        const scrapbookStart = document.querySelector('#scrapbookStart');
+        const photoClass = document.querySelectorAll('.photo');
+        const getPhotos = (e) => sendAjax(e, scrapbookStart, true, "GET");
+        scrapbookStart.addEventListener('click', getPhotos);
+        scrapbookStart.addEventListener('click', function() {
+            console.log("clicked");
+            // animate so it looks like book opens
+            const scrapbookOpen = document.querySelector('#scrapbookOpen');
+            const standardPhoto = document.querySelector('#standardPhoto1');
+            const standardPhoto2 = document.querySelector('#standardPhoto2');
+            const standardPhoto3 = document.querySelector('#standardPhoto3');
+            const standardPhoto4 = document.querySelector('#standardPhoto4');
+            const standardPhoto5 = document.querySelector('#standardPhoto5');
+            const standardPhoto6 = document.querySelector('#standardPhoto6');
+            const standardPhoto7 = document.querySelector('#standardPhoto7');
+            const standardPhoto8 = document.querySelector('#standardPhoto8');
+            const standardPhoto9 = document.querySelector('#standardPhoto9');
+            const displayForm = document.querySelector('#uploadForm');
+            scrapbookStart.style.display = "none";
+            scrapbookOpen.style.display = "block";
+            standardPhoto.style.display = "inline-block";
+            standardPhoto2.style.display = "inline-block";
+            standardPhoto3.style.display = "inline-block";
+            standardPhoto4.style.display = "inline-block";
+            standardPhoto5.style.display = "inline-block";
+            standardPhoto6.style.display = "inline-block";
+            standardPhoto7.style.display = "inline-block";
+            standardPhoto8.style.display = "inline-block";
+            standardPhoto9.style.display = "inline-block";
+            displayForm.style.display = "block";
+            for(let i = 0; i < photoClass.length; i++) {
+                const clickedPhoto = (e) => sendAjax(e, photoClass[i], false, "GET");
+                photoClass[i].addEventListener('click', clickedPhoto);
+            }
+        });
+      
+        const uploadForm = document.querySelector('#picForm');
+        const addPic = (e) => sendAjax(e, uploadForm, false, "POST");
+        uploadForm.addEventListener('submit', addPic);
+        
+        const testForm = document.querySelector('#testHead');
+        const testHead = (e) => sendAjax(e, testForm, false, "HEAD");
+        testForm.addEventListener('submit', testHead);
+    };
+    window.onload = init;
+
+  </script>
+</head>
+<body>
+  <section id="content">
+    <img id="scrapbookStart" src="scrapbookPNG.png" alt="scrapbookPNG" action="initialGet">
+    <div id="parentLeft">
+        <section id="left">
+            <img id="scrapbookOpen" src="scrapbookOpen.png" alt="scrapbookOpen">
+            <img id="standardPhoto1" alt="selfPortrait" class="photo" action="standardPhoto1">
+            <img id="standardPhoto2" alt="space" class="photo" action="standardPhoto2">
+            <img id="standardPhoto3" alt="standardPhoto" class="photo" action="standardPhoto3">
+            <img id="standardPhoto4" alt="standardPhoto" class="photo" action="standardPhoto4">
+            <img id="standardPhoto5" alt="standardPhoto" class="photo" action="standardPhoto5">
+            <img id="standardPhoto6" alt="standardPhoto" class="photo" action="standardPhoto6">
+            <img id="standardPhoto7" alt="standardPhoto" class="photo" action="standardPhoto7">
+            <img id="standardPhoto8" alt="standardPhoto" class="photo" action="standardPhoto8">
+            <img id="standardPhoto9" alt="standardPhoto" class="photo" action="standardPhoto9">
+        </section>
+   </div>
+   <div id="parentRight">
+        <section id="right">
+             <div id="uploadForm">
+                 <form id="picForm" action="/uploadPhoto" method="post">
+                    <label for="title">Title: </label>
+                    <input id="titleField" type="text" name="title" />
+                    <label for="picNum">Index: </label>
+                    <input id="picNumField" type="number" name="picNum" min="1" max="9" step="1"/>
+                    <label for="photo">Photo URL: </label>
+                    <input id="picField" type="text" name="pic" />
+                    <br> 
+                    <input type="submit" value="Upload" />
+                </form>
+                <form id="testHead" action="/getPhoto" method="head">
+                    <input type="submit" value="Test Head"/>
+                </form>
+            </div>
+        </section>
+   </div>
+</section>
+</body>
+</html>

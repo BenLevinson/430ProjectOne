@@ -1,0 +1,163 @@
+html, body {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    background-color: black;
+    overflow-y: hidden;
+}
+
+#parentLeft {
+    position: relative;
+    top: 0px;
+    left: 0px;
+}
+
+#parentRight {
+    position: relative;
+    top: 0px;
+    left: 0px;
+}
+
+#right h1 {
+    font-size: 2em;
+}
+
+#scrapbookStart {
+    width: 700px;
+    height: 700px;
+    text-align: center;
+    margin: 0 auto;
+    display: block;
+    padding-top: 100px;
+}
+
+#scrapbookStart:hover{
+    cursor: pointer;
+}
+
+#scrapbookOpen {
+    width: 1400px;
+    height: 700px;
+    margin: 0 auto;
+    padding-top: 100px;
+    display: none;
+    position: absolute;
+    top: 0px;
+    left: 250px;
+}
+
+#standardPhoto1 {
+    width: 200px;
+    height: 200px;
+    display: none;
+    margin: 0 auto;
+    position: absolute;
+    top: 115px;
+    left: 275px;
+}
+
+#standardPhoto2 {
+    width: 200px;
+    height: 200px;
+    display: none;
+    margin: 0 auto;
+    position: absolute;
+    top: 115px;
+    left: 500px;
+}
+
+#standardPhoto3 {
+    width: 200px;
+    height: 200px;
+    display: none;
+    margin: 0 auto;
+    position: absolute;
+    top: 115px;
+    left: 725px;
+}
+
+#standardPhoto4 {
+    width: 200px;
+    height: 200px;
+    display: none;
+    margin: 0 auto;
+    position: absolute;
+    top: 340px;
+    left: 275px;
+}
+
+#standardPhoto5 {
+    width: 200px;
+    height: 200px;
+    display: none;
+    margin: 0 auto;
+    position: absolute;
+    top: 340px;
+    left: 500px;
+}
+
+#standardPhoto6 {
+    width: 200px;
+    height: 200px;
+    display: none;
+    margin: 0 auto;
+    position: absolute;
+    top: 340px;
+    left: 725px;
+}
+
+#standardPhoto7 {
+    width: 200px;
+    height: 200px;
+    display: none;
+    margin: 0 auto;
+    position: absolute;
+    top: 565px;
+    left: 275px;
+}
+
+#standardPhoto8 {
+    width: 200px;
+    height: 200px;
+    display: none;
+    margin: 0 auto;
+    position: absolute;
+    top: 565px;
+    left: 500px;
+}
+
+#standardPhoto9 {
+    width: 200px;
+    height: 200px;
+    display: none;
+    margin: 0 auto;
+    position: absolute;
+    top: 565px;
+    left: 725px;
+}
+
+#newImg {
+    width: 500px;
+    height: 500px;
+    display: block;
+    margin: 0 auto;
+    position: absolute;
+    top: 200px;
+    left: 1060px;
+    z-index: 1;
+}
+
+#uploadForm {
+    display: none;
+    position: absolute;
+    margin: 0 auto;
+    z-index: 1;
+    top: 720px;
+    left: 1020px;
+}
+
+.photo:hover {
+    opacity: .6;
+    cursor: pointer;
+}

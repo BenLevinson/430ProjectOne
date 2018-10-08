@@ -4,6 +4,7 @@ html, body {
     margin: 0;
     padding: 0;
     background-color: black;
+    overflow-x: hidden;
     overflow-y: hidden;
 }
 
@@ -16,7 +17,7 @@ html, body {
 #parentRight {
     position: relative;
     top: 0px;
-    left: 0px;
+    left: 950px;
 }
 
 #right h1 {
@@ -144,7 +145,7 @@ html, body {
     margin: 0 auto;
     position: absolute;
     top: 200px;
-    left: 1060px;
+    left: 100px;
     z-index: 1;
 }
 
@@ -154,10 +155,87 @@ html, body {
     margin: 0 auto;
     z-index: 1;
     top: 720px;
-    left: 1020px;
+    left: 50px;
+}
+
+#picButton {
+    display: inline-block;
+    position: relative;
+    top: 10px;
+    left: 50px;
+}
+
+#headButton {
+    display: inline-block;
+    position: relative;
+    bottom: 10px;
+    left: 240px;
+}
+
+#recentButton {
+    display: inline-block;
+    position: relative;
+    bottom: 31px;
+    left: 450px;
+}
+
+#filters {
+    border: 2px solid black;
+    height: 400px;
+    width: 75px;
+    position: relative;
+    top: 245px;
+    left: 610px;
+    display: none;
+    text-align: center;
+}
+
+#filters p:hover {
+    cursor: pointer;
+    color: blue;
 }
 
 .photo:hover {
     opacity: .6;
     cursor: pointer;
+}
+
+.blurPhoto:not(p) {
+    filter: blur(10px);
+}
+
+.brightPhoto:not(p) {
+    filter: brightness(150%);
+}
+
+.contrastPhoto:not(p) {
+    filter: contrast(150%);
+}
+
+.dropPhoto:not(p) {
+    filter: drop-shadow(8px 8px 10px gray);
+}
+
+.grayPhoto:not(p) {
+    filter: grayscale(100%);
+}
+
+.huePhoto:not(p) {
+    filter: hue-rotate(90deg);
+}
+
+.invertPhoto:not(p) {
+    filter: invert(100%);
+}
+
+.opacityPhoto:not(p) {
+    filter: opacity(20%);
+}
+
+.saturatePhoto:not(p) {
+    filter:saturate(10);
+}
+
+.sepiaPhoto:not(p) {
+    filter: sepia(100%);
 }

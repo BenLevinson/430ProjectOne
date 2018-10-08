@@ -1,5 +1,5 @@
-const titles = ['Self Portrait', 'Outer Space', 'Standard Photo (3)', 'Standard Photo (4)', 'Standard Photo (5)', 'Standard Photo (6)', 'Standard Photo (7)', 'Standard Photo (8)', 'Standard Photo (9)'];
-const urls = ['https://i.imgur.com/Mc5FWUK.png', 'https://i.imgur.com/Vg3cMuD.jpg', 'https://i.imgur.com/NiubDNH.png', 'https://i.imgur.com/NiubDNH.png', 'https://i.imgur.com/NiubDNH.png', 'https://i.imgur.com/NiubDNH.png', 'https://i.imgur.com/NiubDNH.png', 'https://i.imgur.com/NiubDNH.png', 'https://i.imgur.com/NiubDNH.png'];
+const titles = ['Self Portrait', 'Outer Space', 'Patrick Stewart', 'Standard Photo (4)', 'Standard Photo (5)', 'Standard Photo (6)', 'Standard Photo (7)', 'Standard Photo (8)', 'Standard Photo (9)'];
+const urls = ['https://i.imgur.com/Mc5FWUK.png', 'https://i.imgur.com/Vg3cMuD.jpg', 'https://i.imgur.com/xkV9diu.jpg', 'https://i.imgur.com/NiubDNH.png', 'https://i.imgur.com/NiubDNH.png', 'https://i.imgur.com/NiubDNH.png', 'https://i.imgur.com/NiubDNH.png', 'https://i.imgur.com/NiubDNH.png', 'https://i.imgur.com/NiubDNH.png'];
 
 const respondJSON = (request, response, status, object) => {
   const headers = {
@@ -35,6 +35,22 @@ const getPhoto = (request, response, num) => {
 
 const getPhotoMeta = (request, response) => {
   return respondJSONMeta(request, response, 200);
+};
+
+const getRecent = (request, response, params, num) => {
+  const responseJSON = {
+    message: 'Most recent picture title: and URL: ' +  titles[num] + ' ' + urls[num],
+    id: 'Successful Request',
+  };
+
+  if (!params.valid || params.valid !== 'true') {
+    responseJSON.message = 'Missing valid query parameter set to true';
+    responseJSON.id = 'badRequest';
+    //400 bad request error
+    return respondJSON(request, response, 400, responseJSON);
+  }
+
+  return respondJSON(request, response, 200, responseJSON);
 };
 
 const uploadPhoto = (request, response, bodyParams) => {
@@ -87,6 +103,7 @@ module.exports = {
   getInitial,
   getPhoto,
   getPhotoMeta,
+  getRecent,
   uploadPhoto,
   notFound,
   notFoundMeta,

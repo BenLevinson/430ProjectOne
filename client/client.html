@@ -21,7 +21,7 @@
                     h1.style.zIndex = '1';
                     h1.style.position = 'absolute';
                     h1.style.top = 100 + 'px';
-                    h1.style.left = 1210 + 'px';
+                    h1.style.left = 250 + 'px';
                     h1.style.textAlign = 'center';
                     h1.textContent = `${jsonParser.message}`;
                     altTitle 
@@ -128,15 +128,24 @@
         e.preventDefault();
         return false;
     };
-
+    
+    const addEffect = (className) => {
+        const pic = document.querySelector('#newImg');
+        if(pic) {
+            pic.removeAttribute('class', pic.classList[0]);
+            pic.setAttribute('class', className);
+            console.log(className);
+        }
+    };
+    
     const init = () => {
         const scrapbookStart = document.querySelector('#scrapbookStart');
         const photoClass = document.querySelectorAll('.photo');
+        const filterBar = document.querySelector('#filters');
         const getPhotos = (e) => sendAjax(e, scrapbookStart, true, "GET");
         scrapbookStart.addEventListener('click', getPhotos);
         scrapbookStart.addEventListener('click', function() {
             console.log("clicked");
-            // animate so it looks like book opens
             const scrapbookOpen = document.querySelector('#scrapbookOpen');
             const standardPhoto = document.querySelector('#standardPhoto1');
             const standardPhoto2 = document.querySelector('#standardPhoto2');
@@ -160,6 +169,7 @@
             standardPhoto8.style.display = "inline-block";
             standardPhoto9.style.display = "inline-block";
             displayForm.style.display = "block";
+            filterBar.style.display = "block";
             for(let i = 0; i < photoClass.length; i++) {
                 const clickedPhoto = (e) => sendAjax(e, photoClass[i], false, "GET");
                 photoClass[i].addEventListener('click', clickedPhoto);
@@ -173,6 +183,14 @@
         const testForm = document.querySelector('#testHead');
         const testHead = (e) => sendAjax(e, testForm, false, "HEAD");
         testForm.addEventListener('submit', testHead);
+        
+        filterBar.addEventListener('click', function(eventArgs) {
+            let p = eventArgs.target;
+            let effectName = 'p';
+            if(p.tagName.toLowerCase() === effectName) {
+                addEffect(p.className);
+            }
+        });
     };
     window.onload = init;
 
@@ -197,8 +215,21 @@
    </div>
    <div id="parentRight">
         <section id="right">
-             <div id="uploadForm">
-                 <form id="picForm" action="/uploadPhoto" method="post">
+            <div id="filters">
+                <p class="blurPhoto">Blur</p>
+                <p class="brightPhoto">Brighten</p>
+                <p class="contrastPhoto">Contrast</p>
+                <p class="dropPhoto">Drop Shadow</p>
+                <p class="grayPhoto">Grayscale</p>
+                <p class="huePhoto">Hue Rotate</p>
+                <p class="normal">Normal</p>
+                <p class="invertPhoto">Invert</p>
+                <p class="opacityPhoto">Opaque</p>
+                <p class="saturatePhoto">Saturate</p>
+                <p class="sepiaPhoto">Sepia</p>
+            </div>
+            <div id="uploadForm">
+                <form id="picForm" action="/uploadPhoto" method="post">
                     <label for="title">Title: </label>
                     <input id="titleField" type="text" name="title" />
                     <label for="picNum">Index: </label>
@@ -206,10 +237,13 @@
                     <label for="photo">Photo URL: </label>
                     <input id="picField" type="text" name="pic" />
                     <br> 
-                    <input type="submit" value="Upload" />
+                    <input type="submit" value="Upload" id="picButton" />
                 </form>
                 <form id="testHead" action="/getPhoto" method="head">
-                    <input type="submit" value="Test Head"/>
+                    <input type="submit" value="Test Head" id="headButton"/>
+                </form>
+                 <form id="getRecent" action="/getRecent" method="get">
+                    <input type="submit" value="Get Recent" id="recentButton"/>
                 </form>
             </div>
         </section>

@@ -27,7 +27,7 @@ const handlePost = (request, response, parsedUrl) => { // handle post
       const bodyString = Buffer.concat(body).toString();
       const bodyParams = query.parse(bodyString);
       jsonHandler.uploadPhoto(request, res, bodyParams);
-      recentNum = bodyParams.picNum - 1; // if image was posted, it becomes the most recently clicked by default
+      recentNum = bodyParams.picNum - 1; // posted image becomes most recently clicked
     });
   }
 };
@@ -96,7 +96,6 @@ const onRequest = (request, response) => {
       break;
     default:
       jsonHandler.notFound(request, response);
-      console.dir('hit case');
       break;
   }
 };

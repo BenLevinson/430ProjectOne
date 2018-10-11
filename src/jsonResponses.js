@@ -2,7 +2,7 @@
 const titles = ['Self Portrait', 'Outer Space', 'Patrick Stewart', 'Standard Photo (4)', 'Standard Photo (5)', 'Standard Photo (6)', 'Standard Photo (7)', 'Standard Photo (8)', 'Standard Photo (9)'];
 const urls = ['https://i.imgur.com/Mc5FWUK.png', 'https://i.imgur.com/Vg3cMuD.jpg', 'https://i.imgur.com/xkV9diu.jpg', 'https://i.imgur.com/NiubDNH.png', 'https://i.imgur.com/NiubDNH.png', 'https://i.imgur.com/NiubDNH.png', 'https://i.imgur.com/NiubDNH.png', 'https://i.imgur.com/NiubDNH.png', 'https://i.imgur.com/NiubDNH.png'];
 
-const respondJSON = (request, response, status, object) => { 
+const respondJSON = (request, response, status, object) => {
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Content-Type': 'application/json',
@@ -35,12 +35,12 @@ const getPhoto = (request, response, num) => { // get photo after initial get ca
   return respondJSON(request, response, 200, responseJSON);
 };
 
-const getPhotoMeta = (request, response) => respondJSONMeta(request, response, 200); 
+const getPhotoMeta = (request, response) => respondJSONMeta(request, response, 200);
 
 const getRecent = (request, response, params, num) => { // get recent source
   const responseJSON = {
     message1: `Most recent picture title: ${titles[num]}`,
-    message2: `Most recent picture url: `,
+    message2: 'Most recent picture url: ',
     message3: urls[num],
     id: 'Successful Request',
   };
@@ -58,36 +58,35 @@ const uploadPhoto = (request, response, bodyParams) => { // upload image
   const responseJSON = {
     message: 'Error: Title, index, and url are all required.',
   };
-
-  if (!bodyParams.title || !bodyParams.picNum || !bodyParams.photo) { // make sure all params are filled out and valid
+  // make sure all params are filled out and valid
+  if (!bodyParams.title || !bodyParams.picNum || !bodyParams.photo) {
     responseJSON.id = 'missingParams';
     return respondJSON(request, response, 400, responseJSON);
   }
-    
+
   let responseCode = 201;
-    
-  for(let i = 0; i < titles.length; i++) { 
-      if(bodyParams.title === titles[i] && bodyParams.picNum - 1 !== i) {
-          responseJSON.message = 'Error: An uploaded photo already has that title.'; // if user tries to upload image with a title that already exists, don't let them
-          responseCode = 400;
-          return respondJSON(request, response, responseCode, responseJSON);
-      } else if(bodyParams.title === titles[i] && bodyParams.picNum - 1 === i) { // if user tries to update image but keep the same title
-          responseCode = 204;
-      } else {
-          titles[bodyParams.title] = {};
-      }
+  for (let i = 0; i < titles.length; i++) {
+    if (bodyParams.title === titles[i] && bodyParams.picNum - 1 !== i) {
+      responseJSON.message = 'Error: An uploaded photo already has that title.';
+      responseCode = 400; // don't let user upload image with existing title
+      return respondJSON(request, response, responseCode, responseJSON);
+    } if (bodyParams.title === titles[i] && bodyParams.picNum - 1 === i) {
+      responseCode = 204; // if user tries to update image but keep the same title
+    } else {
+      titles[bodyParams.title] = {};
+    }
   }
 
-  titles[bodyParams.title].title = bodyParams.title; // set title, photo, and picnum and save into titles
+  titles[bodyParams.title].title = bodyParams.title; // set title, photo, and picnum
   titles[bodyParams.title].picNum = bodyParams.picNum;
   titles[bodyParams.title].photo = bodyParams.photo;
   titles[bodyParams.picNum - 1] = titles[bodyParams.title].title;
 
-  urls[bodyParams.title] = bodyParams.title; // set title, photo, and picnum and save into urls
+  urls[bodyParams.title] = bodyParams.title; // set title, photo, and picnum
   urls[bodyParams.photo] = bodyParams.photo;
   urls[bodyParams.picNum - 1] = bodyParams.photo;
 
-  if(responseCode === 201) { // return with 201 if created successfully
+  if (responseCode === 201) { // return with 201 if created successfully
     responseJSON.message = titles[bodyParams.title].title;
     responseJSON.url = titles[bodyParams.title].photo;
     return respondJSON(request, response, responseCode, responseJSON);
@@ -95,7 +94,7 @@ const uploadPhoto = (request, response, bodyParams) => { // upload image
   return respondJSONMeta(request, response, responseCode); // return meta data if updating
 };
 
-const notFound = (request, response) => { 
+const notFound = (request, response) => {
   const responseJSON = {
     message: 'Error: The page you are looking for was not found.',
     id: 'notFound',

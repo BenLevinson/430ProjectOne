@@ -1,71 +1,149 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Scrapbook API</title>
+  <title>Image API</title>
   <link rel="stylesheet" type="text/css" href="/style.css">
-  
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
   <script type="text/babel">
     
-    let currNum = 0;
-
-    const parseJSON = (xhr, right, initialGet, newImage) => {
+    let currNum = 0; // default index for uploading image
+    let getRecentPhoto = false; // if user wants to get source for most recent clicked image
+    let canvas = document.getElementById('canvas');
+    let ctx = canvas.getContext('2d');
+    const parseJSON = (xhr, right, initialGet, newImage) => { // parses JSON messages
         const jsonParser = JSON.parse(xhr.response);  
         const altTitle = `${jsonParser.message}`;
-        if(!initialGet) {
-            if(jsonParser.message) {
-                if(!right.querySelector('#h1')) {
+        if(!initialGet && !getRecentPhoto) {
+            if(jsonParser.message && jsonParser.message[0] != 'E') { // Case to handle if the message exists and it isn't an error
+                if(!right.querySelector('#h1')) { // create element of text and position it as title of image on page
                     const h1 = document.createElement('h1');
                     h1.setAttribute('id', 'h1');
                     h1.style.color = 'black';
                     h1.style.zIndex = '1';
-                    h1.style.position = 'absolute';
-                    h1.style.top = 100 + 'px';
-                    h1.style.left = 250 + 'px';
-                    h1.style.textAlign = 'center';
+                    h1.style.position = 'relative';
+                    h1.style.bottom = 300 + 'px';
+                    h1.style.left = calculatePos(jsonParser.message.length) + 'px';
                     h1.textContent = `${jsonParser.message}`;
-                    altTitle 
                     right.appendChild(h1);
-                } else {
+                } else { // if element already exists, just replace text
+                    h1.style.left = calculatePos(jsonParser.message.length) + 'px';
                     right.querySelector('#h1').innerHTML = `${jsonParser.message}`;
                 }
+            } else { // error message; create alert for it
+                window.alert(`${jsonParser.message}`);
             }
         }
-        if(jsonParser.url) {
-            if(!initialGet)
+        if(jsonParser.url) { // case for image url
+            if(!initialGet) // make displayed image the url of uploaded image
                 right.querySelector('#newImg').src = `${jsonParser.url}`;
             
-            if(newImage) {
+            if(newImage) { // change images on left side to url of uploaded image
                 document.querySelector('#standardPhoto' + currNum).src = `${jsonParser.url}`;
                 document.querySelector('#standardPhoto' + currNum).alt = altTitle;
-            } else if(initialGet) {
+            } else if(initialGet) { // case to handle initial load in of images
                 for(let i = 1; i < 10; i++) {
                     document.querySelector('#standardPhoto' + i).src = `${jsonParser.url[i-1]}`;
                     document.querySelector('#standardPhoto' + i).alt = altTitle;
-                    console.dir("url: " + `${jsonParser.url}`);
                 }                
             }
            
         }
+        
+        if(getRecentPhoto) { // if user has selected to get the most recent photo's source, hide previous elements on page and display title of image and original url
+            if(right.querySelector('#newImg'))
+                right.querySelector('#newImg').style.display = 'none';
+            if(right.querySelector('#h1'))
+                right.querySelector('#h1').style.display = 'none';
+            right.querySelector('#filters').style.visibility = 'hidden';
+            
+            if(!right.querySelector('#m1')) {
+                const m1 = document.createElement('h2');
+                m1.setAttribute('id', 'm1');
+                m1.style.color = 'black';
+                m1.style.zIndex = '1';
+                m1.style.position = 'relative';
+                m1.style.bottom = 100 + 'px';
+                m1.style.left = 50 + 'px';
+                m1.textContent = `${jsonParser.message1}`;
+                right.appendChild(m1);
+            } else {
+                right.querySelector('#m1').innerHTML = `${jsonParser.message1}`;
+                right.querySelector('#m1').style.display = 'block';
+            }
+            
+            if(!right.querySelector('#m2')) {
+                const m2 = document.createElement('h2');
+                m2.setAttribute('id', 'm2');
+                m2.style.color = 'black';
+                m2.style.zIndex = '1';
+                m2.style.position = 'relative';
+                m2.style.bottom = 25 + 'px';
+                m2.style.left = 50 + 'px';
+                m2.textContent = `${jsonParser.message2}`;
+                right.appendChild(m2);
+            } else {
+                right.querySelector('#m2').innerHTML = `${jsonParser.message2}`;
+                right.querySelector('#m2').style.display = 'block';
+            }
+            
+            if(!right.querySelector('#m3')) {
+                const m3 = document.createElement('h3');
+                m3.setAttribute('id', 'm3');
+                m3.style.color = 'black';
+                m3.style.zIndex = '1';
+                m3.style.position = 'relative';
+                m3.style.bottom = 0 + 'px';
+                m3.style.left = 50 + 'px';
+                m3.textContent = `${jsonParser.message3}`;
+                right.appendChild(m3);
+            } else {
+                right.querySelector('#m3').innerHTML = `${jsonParser.message3}`;
+                right.querySelector('#m3').style.display = 'block';
+            }
+            
+        } else {
+            right.querySelector('#filters').style.visibility = 'visible';
+            if(right.querySelector('#newImg'))
+                right.querySelector('#newImg').style.display = 'block';
+            if(right.querySelector('#h1'))
+                right.querySelector('#h1').style.display = 'block';
+            if(right.querySelector('#m1'))
+                right.querySelector('#m1').style.display = 'none'; 
+            if(right.querySelector('#m2'))
+                right.querySelector('#m2').style.display = 'none';
+            if(right.querySelector('#m3'))
+                right.querySelector('#m3').style.display = 'none';
+        }
+    };
+    
+    const calculatePos = (length) => { // calculate area of screen for message to appear
+        if(length < 10) {
+            return 295;
+        } else if(length < 15 && length > 9) {
+            return 270 - length;
+            
+        } else {
+            return 240 - length;
+        }
     };
 
-    const handleResponse = (xhr, parseResponse, initialGet) => {
+    const handleResponse = (xhr, parseResponse, initialGet) => { // handles response from server
       const right = document.querySelector('#right');
       let newImage = false;
       switch(xhr.status) {
         case 200:
-          if(!initialGet && parseResponse) {
+          if(!initialGet && parseResponse) { // get image from server and display it on right screen
               if(!right.querySelector('#newImg')) {
                 const newImg = document.createElement('img');
                 newImg.setAttribute('id', 'newImg');
                 right.appendChild(newImg);
                 console.log("Success");
               }
-          } else if(!initialGet && !parseResponse) {
+          } else if(!initialGet && !parseResponse) { // show that head test works
               console.log("Head data test successful");
           }
           break;
-        case 201: 
+        case 201: // uploaded new image
           if(!right.querySelector('#newImg')) {
             const newImg = document.createElement('img');
             newImg.setAttribute('id', 'newImg');
@@ -74,46 +152,63 @@
           newImage = true;
           console.log("Created");
           break;
-        case 204:
-          newImage = true;
+        case 204: // update previous image; replace srcs on client side as update doesn't give any new data back
           console.log("Updated");
-          return;
-        case 400:
+          document.querySelector('#newImg').src = document.querySelector('#picField').value;
+          document.querySelector('#standardPhoto' + currNum).src = document.querySelector('#picField').value;
+          if(document.querySelector('#m3'))
+              document.querySelector('#m3').innerHTML = document.querySelector('#picField').value;
+          parseResponse = false;
+          break;
+        case 400: // bad request
           console.log("Bad Request");
           break;
-        case 404:
+        case 404: // not found
           console.log("Not Found");
           break;
-        default: 
+        default:  // not implemented
           console.log("Error code not implemented by client.");
           break;
       }
+        
+      document.querySelector('#titleField').value = ""; // reset text in 3 fields
+      document.querySelector('#picNumField').value = "";
+      document.querySelector('#picField').value = "";
+        
       if(parseResponse)
         parseJSON(xhr, right, initialGet, newImage);
      
     };
 
-    const sendAjax = (e, photo, initialGet, method) => {
+    const sendAjax = (e, photo, initialGet, method) => { // ajax requests
         const picTitle = photo.querySelector('#titleField');
         const picUpload = photo.querySelector('#picField');
         const picNum = photo.querySelector('#picNumField');
-        if(method === 'GET' || method === 'HEAD') {
-            const photoName = photo.getAttribute('action');
+        if(method === 'GET' || method === 'HEAD') { // get and head requests
+            let photoName = photo.getAttribute('action');
+            getRecentPhoto = false;
+            if(photoName === '/getRecent') { // if user clicked to get source of recent image and an image was clicked, allow the user to see its source
+                if(document.querySelector('#newImg')) {
+                    photoName = '/getRecent?valid=true';
+                    getRecentPhoto = true;
+                }
+            } 
             const xhr = new XMLHttpRequest();
-            if(method === 'GET')
+            if(method === 'GET') 
                 xhr.open('GET', photoName);
             else
                 xhr.open('HEAD', photoName);
             xhr.setRequestHeader ('Accept', 'application/json');
-            if(initialGet) {
+            if(initialGet) { // case to handle response on initial get
                 xhr.onload = () => handleResponse(xhr, true, true);
-            } else if(!initialGet && method === 'GET') {
+            } else if(!initialGet && method === 'GET') { // case to handle response of getting photos after initial get
                 xhr.onload = () => handleResponse(xhr, true, false);
-            } else if(!initialGet && method === 'HEAD') {
+            } else if(!initialGet && method === 'HEAD') { // case to handle response of head 
                 xhr.onload = () => handleResponse(xhr, false, false);
             }
             xhr.send();
-        } else if(method === 'POST') {
+        } else if(method === 'POST') { // post request
+            getRecentPhoto = false;
             const formAction = photo.getAttribute('action');
             const xhr = new XMLHttpRequest();
             xhr.open('POST', formAction);
@@ -122,75 +217,132 @@
             xhr.onload = () => handleResponse(xhr, true, initialGet);
             const formData = `title=${picTitle.value}&photo=${picUpload.value}&picNum=${picNum.value}`;
             currNum = picNum.value;
-            xhr.send(formData);
+            xhr.send(formData); // send form data back to server
         }
         
         e.preventDefault();
         return false;
     };
     
-    const addEffect = (className) => {
+    const addEffect = (className) => { // function to add photo effect to new image; removes last effect (if any)
         const pic = document.querySelector('#newImg');
         if(pic) {
             pic.removeAttribute('class', pic.classList[0]);
             pic.setAttribute('class', className);
-            console.log(className);
         }
     };
+
+    const savePic = () => { // function to map picture + effect on canvas and then download it
+        if(!document.querySelector('#newImg')) { // if an image isn't selected, don't let user download anything
+            window.alert('Please select an image to download');
+            return;
+        }
+        let newImg = document.querySelector('#newImg');
+
+        let image = new Image;
+        image.crossOrigin = "anonymous";
+        image.src = newImg.src;
+
+        switch(newImg.classList[0]) { // based on class added to displayed image, apply same effect to unseen canvas
+            case 'blurPhoto':
+                ctx.filter = 'blur(10px)';
+                break;
+            case 'brightPhoto':
+                ctx.filter = 'brightness(150%)'
+                break;
+            case 'contrastPhoto':
+                ctx.filter = 'contrast(150%)';
+                break;
+            case 'dropPhoto':
+                ctx.filter = 'drop-shadow(8px 8px 10 red)'
+                break;
+            case 'grayPhoto':
+                ctx.filter = 'grayscale(100%)';
+                break;
+            case 'huePhoto':
+                ctx.filter = 'hue-rotate(90deg)';
+                break;
+            case 'normal':
+                ctx.filter = 'none';
+                break;
+            case 'invertPhoto':
+                ctx.filter = 'invert(100%)';
+                break;
+            case 'opacityPhoto':
+                ctx.filter = 'opacity(20%)';
+                break;
+            case 'saturatePhoto':
+                ctx.filter = 'saturate(10%)';
+                break;
+            case 'sepiaPhoto':
+                ctx.filter = 'sepia(100%)';
+                break;
+            default:
+                ctx.filter = 'none';
+                break;
+        }
+        
+        image.onload = function() { // make sure image is loaded in before user can download
+            ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+            let data = canvas.toDataURL('image/png');
+            var a = document.createElement('a');
+            a.href = data;
+            a.download = 'image.png';
+            a.click();   
+        };
+    };
     
-    const init = () => {
+    const init = () => { 
         const scrapbookStart = document.querySelector('#scrapbookStart');
-        const photoClass = document.querySelectorAll('.photo');
         const filterBar = document.querySelector('#filters');
-        const getPhotos = (e) => sendAjax(e, scrapbookStart, true, "GET");
+        const getPhotos = (e) => sendAjax(e, scrapbookStart, true, "GET"); // initial get for photos
         scrapbookStart.addEventListener('click', getPhotos);
-        scrapbookStart.addEventListener('click', function() {
-            console.log("clicked");
+        scrapbookStart.addEventListener('click', function() { // clicking the scrapbook fades it out and fades in other elements
             const scrapbookOpen = document.querySelector('#scrapbookOpen');
-            const standardPhoto = document.querySelector('#standardPhoto1');
-            const standardPhoto2 = document.querySelector('#standardPhoto2');
-            const standardPhoto3 = document.querySelector('#standardPhoto3');
-            const standardPhoto4 = document.querySelector('#standardPhoto4');
-            const standardPhoto5 = document.querySelector('#standardPhoto5');
-            const standardPhoto6 = document.querySelector('#standardPhoto6');
-            const standardPhoto7 = document.querySelector('#standardPhoto7');
-            const standardPhoto8 = document.querySelector('#standardPhoto8');
-            const standardPhoto9 = document.querySelector('#standardPhoto9');
             const displayForm = document.querySelector('#uploadForm');
-            scrapbookStart.style.display = "none";
-            scrapbookOpen.style.display = "block";
-            standardPhoto.style.display = "inline-block";
-            standardPhoto2.style.display = "inline-block";
-            standardPhoto3.style.display = "inline-block";
-            standardPhoto4.style.display = "inline-block";
-            standardPhoto5.style.display = "inline-block";
-            standardPhoto6.style.display = "inline-block";
-            standardPhoto7.style.display = "inline-block";
-            standardPhoto8.style.display = "inline-block";
-            standardPhoto9.style.display = "inline-block";
-            displayForm.style.display = "block";
-            filterBar.style.display = "block";
-            for(let i = 0; i < photoClass.length; i++) {
-                const clickedPhoto = (e) => sendAjax(e, photoClass[i], false, "GET");
-                photoClass[i].addEventListener('click', clickedPhoto);
-            }
+            scrapbookStart.setAttribute('class', 'fadeOutClass');
+            setTimeout(function() { // 2 second delay after initial click to give proper time for initial picture to fade out
+                scrapbookStart.style.display = "none";
+                scrapbookOpen.style.display = "block";
+                scrapbookOpen.setAttribute('class', 'fadeInClass');
+                displayForm.setAttribute('class', 'fadeInClass');
+                filterBar.setAttribute('class', 'fadeInClass');
+                for(let i = 1; i < 10; i++) {
+                    document.querySelector('#standardPhoto'+i).setAttribute('class', 'fadeInClass photo');
+                    document.querySelector('#standardPhoto'+i).style.display = 'inline-block';
+                }
+                displayForm.style.display = 'block';
+                filterBar.style.display = 'block';
+            }, 2000);
         });
       
-        const uploadForm = document.querySelector('#picForm');
+        const photoClass = document.querySelectorAll('.photo'); // add click listeners to each image
+        for(let i = 0; i < photoClass.length; i++) {
+            const clickedPhoto = (e) => sendAjax(e, photoClass[i], false, "GET");
+            photoClass[i].addEventListener('click', clickedPhoto);
+        }
+        const uploadForm = document.querySelector('#picForm'); // click to upload image
         const addPic = (e) => sendAjax(e, uploadForm, false, "POST");
         uploadForm.addEventListener('submit', addPic);
         
-        const testForm = document.querySelector('#testHead');
+        const testForm = document.querySelector('#testHead'); // click to test head
         const testHead = (e) => sendAjax(e, testForm, false, "HEAD");
-        testForm.addEventListener('submit', testHead);
+        testForm.addEventListener('submit', testHead); 
         
-        filterBar.addEventListener('click', function(eventArgs) {
+        const recentForm = document.querySelector('#recentButton'); // click to get source data
+        const getRecent = (e) => sendAjax(e, recentForm, false, "GET");
+        recentForm.addEventListener('click', getRecent);
+        
+        filterBar.addEventListener('click', function(eventArgs) { // click to change effect on displayed image
             let p = eventArgs.target;
             let effectName = 'p';
             if(p.tagName.toLowerCase() === effectName) {
                 addEffect(p.className);
             }
         });
+        
+        let startDownload = document.querySelector('#downloadButton');
+        startDownload.addEventListener('click', savePic); // click to save picture from canvas
     };
     window.onload = init;
 
@@ -215,6 +367,7 @@
    </div>
    <div id="parentRight">
         <section id="right">
+            <canvas id="canvas"> </canvas>
             <div id="filters">
                 <p class="blurPhoto">Blur</p>
                 <p class="brightPhoto">Brighten</p>
@@ -242,9 +395,8 @@
                 <form id="testHead" action="/getPhoto" method="head">
                     <input type="submit" value="Test Head" id="headButton"/>
                 </form>
-                 <form id="getRecent" action="/getRecent" method="get">
-                    <input type="submit" value="Get Recent" id="recentButton"/>
-                </form>
+                <button type="button" action="/getRecent" id="recentButton" method="get">Get Source</button>
+                <button id="downloadButton"> Download </button>
             </div>
         </section>
    </div>

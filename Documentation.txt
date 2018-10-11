@@ -1,0 +1,56 @@
+Ben Levinson - API Project Documentation
+
+What your site does and its purpose
+
+- My API project takes images from the internet (as well as the ones that are originally
+loaded in) and allows users to upload them to my site. They can then play around with
+several filters for the images and download them (Due to CORS you may need to enable
+a google chrome extension to get this to always work; I couldn't figure out how to
+make it fully compatable with each uploaded image). 
+
+- Users 'get' images by selecting one on the left side of the screen and can 'post' by
+uploading images found on the internet and filling in the parameters validly. 'Head'
+wasn't really a factor in the site, but clicking the 'Test Head' button will result
+in the meta data being sent back and a statement in the console to show that. The
+'get source' button uses a query parameter to make sure an image was clicked (valid)
+before returning its title and original url.
+
+What part of your app does the API handle?
+
+- The API handles the posting of images, getting all of the images (initial site load in
+and when a user clicks an image) and the 'get source' aspect of the site.
+
+What went right and what went wrong?
+
+- I originally wanted users to be able to upload their own images, but that proved
+too difficult. I had a big plan for the project that I had to scale down very hard
+and pick and choose what I could get done. Thus, no fancy flip book animations
+were implemented and there is only one page of the opened book. I saw you could 
+just install an npm library for the same fancy effects, but I wasn't sure if I was
+allowed to use that for the project.
+
+- I'm no artist, so the art isn't that great while we're on that page. I told myself
+I'd come back to it but never got around to it.
+
+- While very small in comparison to what I wanted to do, the site is functional and
+while not on a large scale, if developed further (turn animations instead of fade-ins,
+multiple pages, better art/design, database implementation) would seem very useful for
+online photo-sharing.
+
+If you were to continue, how would you improve your app?
+
+- Art, animation, and database implementation would be the big 3 I'd want to hit.
+I'd want it to look and feel like a scrapbook with the art and animations I'd put in,
+and the database would let photos stay until they were replaced. Ideally, more pages
+as well and a reach goal of dynamically creating them and the images loaded onto
+them every time a new picture is uploaded, but databases would needed to be put in first.
+
+How did you go above and beyond?
+
+While my original plan was to do user uploaded images, I settled for the user being
+able to edit uploaded images and downloading them (those which CORS allows, but again
+using a google chrome extension means they'll all work). I researched it for a while
+because it seemed a lot easier than turned out to be. I would have loved to have taken
+it another step further and let users draw on the image or share it on social media,
+but I ran out of time.
+

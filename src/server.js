@@ -3,11 +3,12 @@ const url = require('url');
 const query = require('querystring');
 const htmlHandler = require('./htmlResponses.js');
 const jsonHandler = require('./jsonResponses.js');
-let recentNum = 0;
+
+let recentNum = 0; // keep track of which was the most recently clicked image
 
 const port = process.env.PORT || process.env.NODE_PORT || 3000;
 
-const handlePost = (request, response, parsedUrl) => {
+const handlePost = (request, response, parsedUrl) => { // handle post
   if (parsedUrl.pathname === '/uploadPhoto') {
     const res = response;
     const body = [];
@@ -26,6 +27,7 @@ const handlePost = (request, response, parsedUrl) => {
       const bodyString = Buffer.concat(body).toString();
       const bodyParams = query.parse(bodyString);
       jsonHandler.uploadPhoto(request, res, bodyParams);
+      recentNum = bodyParams.picNum - 1; // if image was posted, it becomes the most recently clicked by default
     });
   }
 };
@@ -34,7 +36,7 @@ const onRequest = (request, response) => {
   const parsedUrl = url.parse(request.url);
   const params = query.parse(parsedUrl.query);
   switch (request.method) {
-    case 'GET':
+    case 'GET': // get requests
       if (parsedUrl.pathname === '/') {
         htmlHandler.getIndex(request, response);
       } else if (parsedUrl.pathname === '/style.css') {
@@ -68,8 +70,8 @@ const onRequest = (request, response) => {
       } else if (parsedUrl.pathname === '/standardPhoto9') {
         jsonHandler.getPhoto(request, response, 8);
         recentNum = 8;
-      } else if(parsedUrl.pathname === '/getRecent') {
-        jsonHandler.getRecent(request, response, params, recentNum);  
+      } else if (parsedUrl.pathname === '/getRecent') {
+        jsonHandler.getRecent(request, response, params, recentNum);
       } else if (parsedUrl.pathname === '/scrapbookPNG.png') {
         htmlHandler.getImage(request, response, 0);
       } else if (parsedUrl.pathname === '/scrapbookOpen.png') {
@@ -78,14 +80,14 @@ const onRequest = (request, response) => {
         jsonHandler.notFound(request, response);
       }
       break;
-    case 'HEAD':
+    case 'HEAD': // head request
       if (parsedUrl.pathname === '/getPhoto') {
         jsonHandler.getPhotoMeta(request, response);
       } else {
         jsonHandler.notFoundMeta(request, response);
       }
       break;
-    case 'POST':
+    case 'POST': // post request
       if (parsedUrl.pathname === '/uploadPhoto') {
         handlePost(request, response, parsedUrl);
       } else {
@@ -94,7 +96,7 @@ const onRequest = (request, response) => {
       break;
     default:
       jsonHandler.notFound(request, response);
-      console.dir("hit case");
+      console.dir('hit case');
       break;
   }
 };
